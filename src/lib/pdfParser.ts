@@ -1,11 +1,4 @@
-import * as pdfjsLib from "pdfjs-dist";
-// @ts-ignore - vite worker import
-import workerSrc from "pdfjs-dist/build/pdf.worker.mjs?url";
 import type { RateRecord } from "./db";
-
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-}
 
 const TARGET_CCYS = ["USD", "GBP", "ZAR", "EUR", "BWP"];
 
@@ -15,7 +8,24 @@ export interface ParsedSheet {
   rawText: string;
 }
 
+let pdfjsPromise: Promise<typeof import("pdfjs-dist")> | null = null;
+const loadPdfJs = async () => {
+  if (typeof window === "undefined") {
+    throw new Error("PDF parsing is only available in the browser");
+  }
+  if (!pdfjsPromise) {
+    pdfjsPromise = (async () => {
+      const pdfjsLib = await import("pdfjs-dist");
+      const workerSrc = (await import("pdfjs-dist/build/pdf.worker.mjs?url")).default;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+      return pdfjsLib;
+    })();
+  }
+  return pdfjsPromise;
+};
+
 export const parseRbzPdf = async (file: File): Promise<ParsedSheet> => {
+  const pdfjsLib = await loadPdfJs();
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
   let fullText = "";
@@ -25,7 +35,6 @@ export const parseRbzPdf = async (file: File): Promise<ParsedSheet> => {
     fullText += content.items.map((it: any) => it.str).join(" ") + "\n";
   }
 
-  // Try to find a date like "02 June 2026" or "2026-06-02"
   const dateMatch =
     fullText.match(/(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})/i) ||
     fullText.match(/(\d{4}-\d{2}-\d{2})/);
@@ -33,7 +42,6 @@ export const parseRbzPdf = async (file: File): Promise<ParsedSheet> => {
 
   const rows: RateRecord[] = [];
   for (const ccy of TARGET_CCYS) {
-    // Look for currency code followed by 3-6 numeric values
     const re = new RegExp(`${ccy}[^0-9-]*([0-9]+\\.[0-9]+)[^0-9-]+([0-9]+\\.[0-9]+)[^0-9-]+([0-9]+\\.[0-9]+)`, "i");
     const m = fullText.match(re);
     if (m) {
