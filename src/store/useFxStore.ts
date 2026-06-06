@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRecord } from "@/lib/db";
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
-import { parseRbzPdf } from "@/lib/pdfParser";
 
 export type SyncStatus = "idle" | "connected" | "syncing" | "cached" | "manual";
 
@@ -63,6 +62,11 @@ export const useFxStore = create<FxState>((set, get) => ({
       payload: { name: file.name, size: file.size },
     });
     try {
+      if (typeof window === "undefined") {
+        throw new Error("PDF parsing is only available in the browser");
+      }
+
+      const { parseRbzPdf } = await import("@/lib/pdfParser");
       const parsed = await parseRbzPdf(file);
       if (parsed.rows.length === 0) {
         await addAudit({
