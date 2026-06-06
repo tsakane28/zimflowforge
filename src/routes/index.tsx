@@ -31,9 +31,7 @@ function Dashboard() {
   }, [rates]);
 
   const pickPrev = (ccy: string) => yday.find((r) => r.currency === ccy)?.mid;
-  const get = (ccy: string) => today.find((r) => r.currency === ccy);
 
-  const headlinePairs = ["USD", "GBP", "ZAR"] as const;
   const trendPairs = [
     { ccy: "USD", color: "var(--color-accent)" },
     { ccy: "GBP", color: "oklch(0.55 0.16 150)" },
@@ -76,23 +74,29 @@ function Dashboard() {
       </section>
 
       <section>
-        <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Headline Pairs</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {headlinePairs.map((ccy) => {
-            const r = get(ccy);
-            if (!r) return null;
-            return (
+        <div className="flex items-baseline justify-between mb-2">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            Currency Pairs — Latest Publication
+          </div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-muted-foreground">
+            {today.length} pairs
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {today
+            .slice()
+            .sort((a, b) => a.currency.localeCompare(b.currency))
+            .map((r) => (
               <RateCard
-                key={ccy}
-                pair={`${ccy}/ZWG`}
+                key={r.currency}
+                pair={`${r.currency}/ZWG`}
                 bid={r.bid}
                 ask={r.ask}
                 mid={r.mid}
-                previousMid={pickPrev(ccy)}
+                previousMid={pickPrev(r.currency)}
                 asOf={r.date}
               />
-            );
-          })}
+            ))}
         </div>
       </section>
 

@@ -44,8 +44,9 @@ export const useFxStore = create<FxState>((set, get) => ({
         ? `${prefix}Seed dataset loaded – ${longDate}`
         : `${prefix}Using cached data – ${longDate}`,
     });
-    // silence unused import warning if mostRecentBusinessDay tree-shaken
     void mostRecentBusinessDay;
+    // Auto-fetch latest publication on load (weekend-aware).
+    try { await get().runSync(); } catch { /* swallow — cached data already shown */ }
   },
 
 
