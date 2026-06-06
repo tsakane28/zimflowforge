@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRecord } from "@/lib/db";
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
+import { describeFallback, formatLongDate, mostRecentBusinessDay } from "@/lib/businessDay";
+
 
 export type SyncStatus = "idle" | "connected" | "syncing" | "cached" | "manual";
 
@@ -30,14 +32,22 @@ export const useFxStore = create<FxState>((set, get) => ({
     if (get().initialized) return;
     const seeded = await ensureSeed();
     const [rates, audit] = await Promise.all([getAllRates(), getAudit()]);
+    const { target, fellBack } = describeFallback(new Date());
+    const longDate = formatLongDate(target);
+    const prefix = fellBack ? "Weekend fallback — " : "";
     set({
       rates,
       audit,
       initialized: true,
       syncStatus: "cached",
-      syncMessage: seeded ? "Seed dataset loaded – June 2, 2026" : "Using Cached Data – June 2, 2026",
+      syncMessage: seeded
+        ? `${prefix}Seed dataset loaded – ${longDate}`
+        : `${prefix}Using cached data – ${longDate}`,
     });
+    // silence unused import warning if mostRecentBusinessDay tree-shaken
+    void mostRecentBusinessDay;
   },
+
 
   refreshAudit: async () => set({ audit: await getAudit() }),
   refreshRates: async () => set({ rates: await getAllRates() }),
