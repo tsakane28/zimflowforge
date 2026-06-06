@@ -31,9 +31,7 @@ function Dashboard() {
   }, [rates]);
 
   const pickPrev = (ccy: string) => yday.find((r) => r.currency === ccy)?.mid;
-  const get = (ccy: string) => today.find((r) => r.currency === ccy);
 
-  const headlinePairs = ["USD", "GBP", "ZAR"] as const;
   const trendPairs = [
     { ccy: "USD", color: "var(--color-accent)" },
     { ccy: "GBP", color: "oklch(0.55 0.16 150)" },
