@@ -21,7 +21,7 @@ function Dashboard() {
   const targetDate = useFxStore((s) => s.targetDate);
   const fellBack = useFxStore((s) => s.fellBack);
 
-  const { today, yday, latestDate, displayDate, isExact } = useMemo(() => {
+  const { today, yday, displayDate, isExact } = useMemo(() => {
     const dates = Array.from(new Set(rates.map((r) => r.date))).sort();
     const latest = dates[dates.length - 1] ?? "";
     // Prefer the target (today / Friday-fallback) date; otherwise show latest cached.
@@ -30,7 +30,6 @@ function Dashboard() {
     return {
       today: rates.filter((r) => r.date === display),
       yday: rates.filter((r) => r.date === prevDate),
-      latestDate: latest,
       displayDate: display,
       isExact: display === targetDate,
     };
