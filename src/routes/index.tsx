@@ -18,17 +18,23 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const rates = useFxStore((s) => s.rates);
+  const targetDate = useFxStore((s) => s.targetDate);
+  const fellBack = useFxStore((s) => s.fellBack);
 
-  const { today, yday, latestDate } = useMemo(() => {
+  const { today, yday, displayDate, isExact } = useMemo(() => {
     const dates = Array.from(new Set(rates.map((r) => r.date))).sort();
     const latest = dates[dates.length - 1] ?? "";
-    const prev = dates[dates.length - 2] ?? "";
+    // Prefer the target (today / Friday-fallback) date; otherwise show latest cached.
+    const display = dates.includes(targetDate) ? targetDate : latest;
+    const prevDate = dates[dates.indexOf(display) - 1] ?? "";
     return {
-      today: rates.filter((r) => r.date === latest),
-      yday: rates.filter((r) => r.date === prev),
-      latestDate: latest,
+      today: rates.filter((r) => r.date === display),
+      yday: rates.filter((r) => r.date === prevDate),
+      displayDate: display,
+      isExact: display === targetDate,
     };
-  }, [rates]);
+  }, [rates, targetDate]);
+
 
   const pickPrev = (ccy: string) => yday.find((r) => r.currency === ccy)?.mid;
 
@@ -58,7 +64,7 @@ function Dashboard() {
   return (
     <div className="p-6 space-y-6 max-w-[1600px]">
       <section className="space-y-3">
-        <div className="flex items-baseline justify-between">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Rate Intelligence</h1>
             <p className="text-xs text-muted-foreground">
@@ -66,12 +72,17 @@ function Dashboard() {
             </p>
           </div>
           <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-            Publication&nbsp;<span className="text-foreground">{latestDate || "—"}</span>
+            Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span>
+            {fellBack && <span className="ml-2 text-warning">(weekend fallback)</span>}
+            {!isExact && displayDate && (
+              <span className="ml-2 text-destructive">no PDF yet • showing {displayDate}</span>
+            )}
           </div>
         </div>
         <SyncControls />
         <PdfDropzone />
       </section>
+
 
       <section>
         <div className="flex items-baseline justify-between mb-2">

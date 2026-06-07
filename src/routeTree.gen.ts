@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkbenchRouteImport } from './routes/workbench'
 import { Route as DataIntegrityRouteImport } from './routes/data-integrity'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicRbzScrapeRouteImport } from './routes/api/public/rbz.scrape'
+import { Route as ApiPublicRbzPdfRouteImport } from './routes/api/public/rbz.pdf'
 
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
@@ -28,35 +30,69 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRbzScrapeRoute = ApiPublicRbzScrapeRouteImport.update({
+  id: '/api/public/rbz/scrape',
+  path: '/api/public/rbz/scrape',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRbzPdfRoute = ApiPublicRbzPdfRouteImport.update({
+  id: '/api/public/rbz/pdf',
+  path: '/api/public/rbz/pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
+  '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
+  '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
+  '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
+  '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
+  '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
+  '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/data-integrity' | '/workbench'
+  fullPaths:
+    | '/'
+    | '/data-integrity'
+    | '/workbench'
+    | '/api/public/rbz/pdf'
+    | '/api/public/rbz/scrape'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/data-integrity' | '/workbench'
-  id: '__root__' | '/' | '/data-integrity' | '/workbench'
+  to:
+    | '/'
+    | '/data-integrity'
+    | '/workbench'
+    | '/api/public/rbz/pdf'
+    | '/api/public/rbz/scrape'
+  id:
+    | '__root__'
+    | '/'
+    | '/data-integrity'
+    | '/workbench'
+    | '/api/public/rbz/pdf'
+    | '/api/public/rbz/scrape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DataIntegrityRoute: typeof DataIntegrityRoute
   WorkbenchRoute: typeof WorkbenchRoute
+  ApiPublicRbzPdfRoute: typeof ApiPublicRbzPdfRoute
+  ApiPublicRbzScrapeRoute: typeof ApiPublicRbzScrapeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +118,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/rbz/scrape': {
+      id: '/api/public/rbz/scrape'
+      path: '/api/public/rbz/scrape'
+      fullPath: '/api/public/rbz/scrape'
+      preLoaderRoute: typeof ApiPublicRbzScrapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/rbz/pdf': {
+      id: '/api/public/rbz/pdf'
+      path: '/api/public/rbz/pdf'
+      fullPath: '/api/public/rbz/pdf'
+      preLoaderRoute: typeof ApiPublicRbzPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +139,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DataIntegrityRoute: DataIntegrityRoute,
   WorkbenchRoute: WorkbenchRoute,
+  ApiPublicRbzPdfRoute: ApiPublicRbzPdfRoute,
+  ApiPublicRbzScrapeRoute: ApiPublicRbzScrapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
