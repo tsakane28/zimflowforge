@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRecord } from "@/lib/db";
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
-import { describeFallback, formatLongDate, mostRecentBusinessDay } from "@/lib/businessDay";
+import { describeFallback, formatLongDate, mostRecentBusinessDay, toIsoDate } from "@/lib/businessDay";
 
 
 export type SyncStatus = "idle" | "connected" | "syncing" | "cached" | "manual";
