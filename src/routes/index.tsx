@@ -18,17 +18,24 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const rates = useFxStore((s) => s.rates);
+  const targetDate = useFxStore((s) => s.targetDate);
+  const fellBack = useFxStore((s) => s.fellBack);
 
-  const { today, yday, latestDate } = useMemo(() => {
+  const { today, yday, latestDate, displayDate, isExact } = useMemo(() => {
     const dates = Array.from(new Set(rates.map((r) => r.date))).sort();
     const latest = dates[dates.length - 1] ?? "";
-    const prev = dates[dates.length - 2] ?? "";
+    // Prefer the target (today / Friday-fallback) date; otherwise show latest cached.
+    const display = dates.includes(targetDate) ? targetDate : latest;
+    const prevDate = dates[dates.indexOf(display) - 1] ?? "";
     return {
-      today: rates.filter((r) => r.date === latest),
-      yday: rates.filter((r) => r.date === prev),
+      today: rates.filter((r) => r.date === display),
+      yday: rates.filter((r) => r.date === prevDate),
       latestDate: latest,
+      displayDate: display,
+      isExact: display === targetDate,
     };
-  }, [rates]);
+  }, [rates, targetDate]);
+
 
   const pickPrev = (ccy: string) => yday.find((r) => r.currency === ccy)?.mid;
 
