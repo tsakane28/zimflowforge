@@ -65,7 +65,7 @@ function Dashboard() {
   return (
     <div className="p-6 space-y-6 max-w-[1600px]">
       <section className="space-y-3">
-        <div className="flex items-baseline justify-between">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Rate Intelligence</h1>
             <p className="text-xs text-muted-foreground">
@@ -73,12 +73,17 @@ function Dashboard() {
             </p>
           </div>
           <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-            Publication&nbsp;<span className="text-foreground">{latestDate || "—"}</span>
+            Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span>
+            {fellBack && <span className="ml-2 text-warning">(weekend fallback)</span>}
+            {!isExact && displayDate && (
+              <span className="ml-2 text-destructive">no PDF yet • showing {displayDate}</span>
+            )}
           </div>
         </div>
         <SyncControls />
         <PdfDropzone />
       </section>
+
 
       <section>
         <div className="flex items-baseline justify-between mb-2">
