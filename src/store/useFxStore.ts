@@ -23,16 +23,15 @@ interface FxState {
   importPdf: (file: File) => Promise<{ count: number; date: string }>;
 }
 
-const initial = describeFallback(new Date());
-
 export const useFxStore = create<FxState>((set, get) => ({
   rates: [],
   audit: [],
   syncStatus: "idle",
   syncMessage: "Not synced",
-  targetDate: toIsoDate(initial.target),
-  fellBack: initial.fellBack,
+  targetDate: "",
+  fellBack: false,
   initialized: false,
+
 
   init: async () => {
     if (get().initialized) return;
