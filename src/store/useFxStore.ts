@@ -12,6 +12,8 @@ interface FxState {
   audit: AuditEntry[];
   syncStatus: SyncStatus;
   syncMessage: string;
+  targetDate: string; // today's RBZ publication date (with weekend fallback)
+  fellBack: boolean;
   lastSyncAt?: string;
   initialized: boolean;
   init: () => Promise<void>;
@@ -21,11 +23,15 @@ interface FxState {
   importPdf: (file: File) => Promise<{ count: number; date: string }>;
 }
 
+const initial = describeFallback(new Date());
+
 export const useFxStore = create<FxState>((set, get) => ({
   rates: [],
   audit: [],
   syncStatus: "idle",
   syncMessage: "Not synced",
+  targetDate: toIsoDate(initial.target),
+  fellBack: initial.fellBack,
   initialized: false,
 
   init: async () => {
@@ -40,6 +46,8 @@ export const useFxStore = create<FxState>((set, get) => ({
       audit,
       initialized: true,
       syncStatus: "cached",
+      targetDate: toIsoDate(target),
+      fellBack,
       syncMessage: seeded
         ? `${prefix}Seed dataset loaded – ${longDate}`
         : `${prefix}Using cached data – ${longDate}`,
@@ -56,9 +64,12 @@ export const useFxStore = create<FxState>((set, get) => ({
   runSync: async () => {
     set({ syncStatus: "syncing", syncMessage: "Contacting RBZ publication endpoint…" });
     const res = await syncLatestRBZRates();
+    await get().refreshRates();
     set({
       syncStatus: res.status === "cached" ? "cached" : "connected",
       syncMessage: res.message,
+      targetDate: res.targetDate,
+      fellBack: res.fellBack,
       lastSyncAt: new Date().toISOString(),
     });
     await get().refreshAudit();
