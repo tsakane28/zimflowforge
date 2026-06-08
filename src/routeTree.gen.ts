@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkbenchRouteImport } from './routes/workbench'
 import { Route as DataIntegrityRouteImport } from './routes/data-integrity'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRbzScrapeRouteImport } from './routes/api/public/rbz.scrape'
 import { Route as ApiPublicRbzPdfRouteImport } from './routes/api/public/rbz.pdf'
@@ -23,6 +24,11 @@ const WorkbenchRoute = WorkbenchRouteImport.update({
 const DataIntegrityRoute = DataIntegrityRouteImport.update({
   id: '/data-integrity',
   path: '/data-integrity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +49,7 @@ const ApiPublicRbzPdfRoute = ApiPublicRbzPdfRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/workbench': typeof WorkbenchRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/data-integrity'
     | '/workbench'
     | '/api/public/rbz/pdf'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/data-integrity'
     | '/workbench'
     | '/api/public/rbz/pdf'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/data-integrity'
     | '/workbench'
     | '/api/public/rbz/pdf'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   DataIntegrityRoute: typeof DataIntegrityRoute
   WorkbenchRoute: typeof WorkbenchRoute
   ApiPublicRbzPdfRoute: typeof ApiPublicRbzPdfRoute
@@ -109,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/data-integrity'
       fullPath: '/data-integrity'
       preLoaderRoute: typeof DataIntegrityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   DataIntegrityRoute: DataIntegrityRoute,
   WorkbenchRoute: WorkbenchRoute,
   ApiPublicRbzPdfRoute: ApiPublicRbzPdfRoute,
@@ -145,13 +166,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
