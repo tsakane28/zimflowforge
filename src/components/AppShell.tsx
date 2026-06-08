@@ -1,4 +1,4 @@
-import { Activity, Database, LayoutDashboard, Menu, Wallet, X } from "lucide-react";
+import { Activity, Database, Info, LayoutDashboard, Menu, Wallet, X } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useFxStore } from "@/store/useFxStore";
@@ -8,6 +8,7 @@ const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, desc: "Live rates & trends" },
   { to: "/workbench", label: "Transaction Workbench", icon: Wallet, desc: "Settlement calculator" },
   { to: "/data-integrity", label: "Data Integrity Center", icon: Database, desc: "History & audit" },
+  { to: "/about", label: "Info", icon: Info, desc: "How this was built · README" },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
