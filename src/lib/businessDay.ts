@@ -20,7 +20,14 @@ export const previousBusinessDay = (from: Date): Date => {
   return mostRecentBusinessDay(d);
 };
 
-export const toIsoDate = (d: Date) => d.toISOString().slice(0, 10);
+// Use LOCAL date components so the ISO date matches the user's calendar day
+// (toISOString() would shift to UTC and can land on the previous/next day).
+export const toIsoDate = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
 
 export const formatLongDate = (d: Date) =>
   d.toLocaleDateString("en-GB", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
