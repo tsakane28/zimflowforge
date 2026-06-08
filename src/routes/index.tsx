@@ -96,7 +96,15 @@ function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {today
             .slice()
-            .sort((a, b) => a.currency.localeCompare(b.currency))
+            .sort((a, b) => {
+              const order = ["USD", "ZAR"];
+              const ai = order.indexOf(a.currency);
+              const bi = order.indexOf(b.currency);
+              if (ai !== -1 && bi !== -1) return ai - bi;
+              if (ai !== -1) return -1;
+              if (bi !== -1) return 1;
+              return a.currency.localeCompare(b.currency);
+            })
             .map((r) => (
               <RateCard
                 key={r.currency}
