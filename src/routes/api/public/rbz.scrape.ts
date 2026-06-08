@@ -49,16 +49,24 @@ export const Route = createFileRoute("/api/public/rbz/scrape")({
               .filter((d) => !isWeekend(year, month, d))
               .map(async (day) => {
                 const pdfUrl = buildPdfUrl(year, month, day);
+                const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                // Many static hosts (incl. RBZ) don't return 200 on HEAD even when
+                // the file exists. Use a ranged GET (1 byte) to confirm presence.
                 try {
                   const r = await fetch(pdfUrl, {
-                    method: "HEAD",
-                    headers: { "User-Agent": "Mozilla/5.0 ZW-FX-Workbench/1.0" },
+                    method: "GET",
+                    headers: {
+                      "User-Agent": "Mozilla/5.0 ZW-FX-Workbench/1.0",
+                      Range: "bytes=0-0",
+                    },
                   });
-                  if (r.ok) {
-                    const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                  // 200 (full) or 206 (partial) both mean the file exists.
+                  if (r.status === 200 || r.status === 206) {
+                    // Drain to free the connection.
+                    try { await r.arrayBuffer(); } catch { /* ignore */ }
                     return { date: iso, url: pdfUrl };
                   }
-                } catch { /* ignore */ }
+                } catch { /* network error — treat as missing */ }
                 return null;
               }),
           );
