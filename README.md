@@ -1,13 +1,13 @@
 # Zimbabwe FX Operations Workbench
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: Custom](https://img.shields.io/badge/License-Custom%20Non--Modification-red.svg)](./LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.0-success.svg)](./package.json)
 [![Node](https://img.shields.io/badge/Node-20%2B-brightgreen.svg)]()
 [![Bun](https://img.shields.io/badge/Bun-1.0%2B-orange.svg)]()
 
 **Enterprise Treasury Console for RBZ Exchange-Rate Ingestion, Settlement, and Audit**
 
-A modern, offline-first single-page application that automates daily foreign exchange rate ingestion from the Reserve Bank of Zimbabwe (RBZ), enabling treasury teams to perform real-time settlement calculations and comprehensive auditing—all within the browser.
+A modern, offline-first single-page application that automates daily foreign exchange rate ingestion from the Reserve Bank of Zimbabwe (RBZ), enabling treasury teams to perform real-time settlement calculations and maintain complete audit trails.
 
 ---
 
@@ -142,7 +142,7 @@ npm run preview
         │               │                     │
         │  ┌────────────▼───────────────────┐ │
         │  │   pdfParser.ts (PDF Worker)    │ │
-        │  └────────────��───────────────────┘ │
+        │  └────────────┬───────────────────┘ │
         │               │                     │
         │  ┌────────────▼───────────────────┐ │
         │  │  Zustand State (useFxStore)   │ │
@@ -457,21 +457,37 @@ npm run test
 
 ## 📝 License
 
-This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
+This project is licensed under a **Custom Non-Modification License Agreement** (Version 1.0, June 2026). See [`LICENSE`](./LICENSE) for full terms.
 
-**You are free to:**
-- ✅ Use for personal and commercial purposes
-- ✅ Modify and distribute
-- ✅ Include in proprietary software
+### Summary of Terms
 
-**You must:**
-- ⚠️ Include the original license and copyright notice
+**✅ Permitted:**
+- Non-commercial use in unmodified form
+- Distribution of unmodified copies
+- Personal and internal use
+- Copying and executing the Licensed Work
+
+**❌ Not Permitted Without Agreement:**
+- Modification or creation of derivative works
+- Commercial use or revenue-generating activities
+- Sublicensing or reselling
+- Reverse engineering or decompilation
+
+**⚠️ Commercial Use:**
+Commercial use requires a written partnership or licensing agreement with the licensor. Contact the Zimbabwe FX Operations Workbench Contributors to discuss partnership opportunities.
+
+**📋 Required:**
+- Retention of all copyright notices and license text
+- Identification of unmodified status
+- Compliance with all license terms
 
 ---
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or pull request on GitHub.
+
+**Note:** Contributors should be aware of the non-modification clause in the license. Derivative works and modifications require explicit licensing agreements.
 
 ---
 
@@ -482,6 +498,7 @@ For issues, questions, or feature requests:
 - 📧 **Email:** [Your contact info]
 - 🐛 **GitHub Issues:** [zimflowforge/issues](https://github.com/tsakane28/zimflowforge/issues)
 - 📚 **Documentation:** See `/about` route in the app
+- 🤝 **Commercial Partnerships:** Contact via email for partnership inquiries
 
 ---
 
