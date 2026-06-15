@@ -495,7 +495,7 @@ Contributions are welcome! Please open an issue or pull request on GitHub.
 
 For issues, questions, or feature requests:
 
-- 📧 **Email:** [Your contact info]
+- 📧 **Email:** [tsakaneshiri@gmail.com]
 - 🐛 **GitHub Issues:** [zimflowforge/issues](https://github.com/tsakane28/zimflowforge/issues)
 - 📚 **Documentation:** See `/about` route in the app
 - 🤝 **Commercial Partnerships:** Contact via email for partnership inquiries
