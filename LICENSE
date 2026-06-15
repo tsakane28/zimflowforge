@@ -1,21 +1,51 @@
-MIT License
+Business Source License 1.1
+
+License text copyright (c) 2020, MariaDB Corporation Ab and others.
+
+"Licensor" means the entity that offers the Work under the terms of this License.
+
+"Licensed Work" means the work of authorship, whether in Source or Object form, made available under the License (indicated by a copyright notice that is included in or attached to the work, but not including any form that is merely a link to, or merely combining the text of or merely linking to, the Licensed Work).
+
+"Additional Use Grant" means any additional permissions from Licensor that you may obtain.
+
+"Sell" means practicing any or all of the rights granted to you under this License to provide to third parties, whether the Licensed Work is provided in Source or Object form and whether it is provided as a standalone product or as part of a larger product.
+
+"Licensor" hereby grants you rights under copyright and certain other rights. However, a condition of exercising the rights granted here is that you do not Sell the Licensed Work or Derivatives thereof without first obtaining for each instance of Selling a license to the Licensed Work from Licensor with terms materially different from this License, or materially expanding the permissions granted under this License to the recipient of the Sell.
+
+If you do not wish to condition your rights (a "nonconditional license"), you may not use the Licensed Work under this License and should contact Licensor to negotiate a separate agreement. If Licensor is unable to be contacted, the Licensed Work will be available under the terms set forth in the License on the date Licensor first made the Licensed Work publicly available.
+
+1. Grant of Rights
+
+Subject to the terms and conditions of this License, Licensor hereby grants you a worldwide, non-exclusive, royalty-free, sublicenseable license to reproduce, prepare Derivatives of, publicly display, publicly perform, and distribute the Licensed Work and Derivatives thereof in Source or Object form.
+
+2. Conditions
+
+2.1. Offer of Additional License. If you wish to Sell the Licensed Work or Derivatives thereof, you must provide a copy of this License and the following notice, in a manner reasonably calculated to bring it to the attention of recipients of the Licensed Work being Sold, at the time of Selling and in a manner that does not impose any additional charge, fee or cost to any party:
+
+"This Licensed Work is provided to you as Business Source License. As long as you have not materially expanded the permissions granted under this License, it is provided to you under the Business Source License 1.1 license. If you do wish to expand the permissions and Sell, you must obtain a separate license from the Licensor."
+
+2.2. Condition to Grants. Any rights granted under this License are conditioned upon your not Selling the Licensed Work or Derivatives thereof without a separate written agreement with Licensor for each Sell, on terms materially different from this License or materially expanding the permissions granted by this License.
+
+3. Term
+
+The term of this License begins on the date this License is first applied to the Licensed Work by Licensor and will continue unless terminated under Section 4 of this License.
+
+4. Termination
+
+4.1. Automatic Termination. This License will terminate automatically and the rights granted herein will end if (a) you breach any of the material terms or conditions of this License and fail to cure such breach within thirty (30) days after becoming aware of the breach, or (b) you initiate litigation or other proceedings (excluding any motion or counterclaim in a litigation to which you are not an initiating party) against the Licensor or any other party alleging that the Licensed Work or a Derivative thereof infringes any patent.
+
+4.2. Effect of Termination. Upon any termination of this License: (a) the rights granted to you under this License immediately terminate; and (b) you must cease all use of the Licensed Work and destroy all copies of the Licensed Work in your possession or control within thirty (30) days of the termination.
+
+5. Disclaimer of Warranties
+
+THE LICENSED WORK IS PROVIDED ON AN "AS IS" BASIS. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS OR IMPLIED, INCLUDING (WITHOUT LIMITATION) ANY WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+
+6. Limitation of Liability
+
+UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY (WHETHER IN CONTRACT, TORT, STRICT LIABILITY, OR OTHERWISE) SHALL THE LICENSOR BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE, EXEMPLARY, CONSEQUENTIAL OR SIMILAR DAMAGES (INCLUDING LOST PROFITS, LOST REVENUE, LOSS OF BUSINESS, LOSS OF DATA, BUSINESS INTERRUPTION, OR ANY OTHER COMMERCIAL LOSS), EVEN IF THE LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7. Governing Law
+
+This License is governed by the laws of the jurisdiction in which the Licensor resides (if an individual) or in which the Licensor is incorporated (if a legal entity), excluding such jurisdiction's conflicts of law principles.
 
 Copyright (c) 2026 Zimbabwe FX Operations Workbench Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
