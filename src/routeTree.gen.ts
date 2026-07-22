@@ -10,15 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkbenchRouteImport } from './routes/workbench'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DataIntegrityRouteImport } from './routes/data-integrity'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiPublicRbzScrapeRouteImport } from './routes/api/public/rbz.scrape'
 import { Route as ApiPublicRbzPdfRouteImport } from './routes/api/public/rbz.pdf'
 
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
   path: '/workbench',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataIntegrityRoute = DataIntegrityRouteImport.update({
@@ -36,6 +45,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicRbzScrapeRoute = ApiPublicRbzScrapeRouteImport.update({
   id: '/api/public/rbz/scrape',
   path: '/api/public/rbz/scrape',
@@ -51,7 +78,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
+  '/mcp': typeof McpRoute
   '/workbench': typeof WorkbenchRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
   '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
@@ -59,7 +90,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
+  '/mcp': typeof McpRoute
   '/workbench': typeof WorkbenchRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
   '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
@@ -68,7 +103,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
+  '/mcp': typeof McpRoute
   '/workbench': typeof WorkbenchRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/rbz/pdf': typeof ApiPublicRbzPdfRoute
   '/api/public/rbz/scrape': typeof ApiPublicRbzScrapeRoute
 }
@@ -78,7 +117,11 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/data-integrity'
+    | '/mcp'
     | '/workbench'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/rbz/pdf'
     | '/api/public/rbz/scrape'
   fileRoutesByTo: FileRoutesByTo
@@ -86,7 +129,11 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/data-integrity'
+    | '/mcp'
     | '/workbench'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/rbz/pdf'
     | '/api/public/rbz/scrape'
   id:
@@ -94,7 +141,11 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/data-integrity'
+    | '/mcp'
     | '/workbench'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/rbz/pdf'
     | '/api/public/rbz/scrape'
   fileRoutesById: FileRoutesById
@@ -103,7 +154,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   DataIntegrityRoute: typeof DataIntegrityRoute
+  McpRoute: typeof McpRoute
   WorkbenchRoute: typeof WorkbenchRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicRbzPdfRoute: typeof ApiPublicRbzPdfRoute
   ApiPublicRbzScrapeRoute: typeof ApiPublicRbzScrapeRoute
 }
@@ -115,6 +170,13 @@ declare module '@tanstack/react-router' {
       path: '/workbench'
       fullPath: '/workbench'
       preLoaderRoute: typeof WorkbenchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data-integrity': {
@@ -138,6 +200,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/rbz/scrape': {
       id: '/api/public/rbz/scrape'
       path: '/api/public/rbz/scrape'
@@ -159,7 +242,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   DataIntegrityRoute: DataIntegrityRoute,
+  McpRoute: McpRoute,
   WorkbenchRoute: WorkbenchRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicRbzPdfRoute: ApiPublicRbzPdfRoute,
   ApiPublicRbzScrapeRoute: ApiPublicRbzScrapeRoute,
 }
