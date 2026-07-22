@@ -54,6 +54,13 @@ export const useFxStore = create<FxState>((set, get) => ({
     void mostRecentBusinessDay;
     // Auto-fetch latest publication on load (weekend-aware).
     try { await get().runSync(); } catch { /* swallow — cached data already shown */ }
+    // Re-poll every 15 min so today's PDF is picked up once RBZ publishes it
+    // without needing a manual refresh. Also re-runs when the tab regains focus.
+    if (typeof window !== "undefined") {
+      const poll = () => { void get().runSync().catch(() => {}); };
+      window.setInterval(poll, 15 * 60 * 1000);
+      window.addEventListener("focus", poll);
+    }
   },
 
 
