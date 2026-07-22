@@ -102,12 +102,17 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
     // Did we successfully resolve the target date?
     const finalRates = await getAllRates();
     const haveTarget = finalRates.some((r) => r.date === targetIso);
+    const latestAvailable = data.entries.length
+      ? data.entries[data.entries.length - 1].date
+      : undefined;
     const prefix = fellBack ? "Weekend fallback — " : "";
     return {
       status: haveTarget ? "connected" : "cached",
       message: haveTarget
         ? `${prefix}Live RBZ data – ${formatLongDate(target)} • ${imported} new, ${skipped} cached`
-        : `${prefix}No PDF yet for ${formatLongDate(target)} • showing latest available`,
+        : latestAvailable
+          ? `${prefix}Awaiting RBZ publication for ${formatLongDate(target)} – showing latest (${latestAvailable})`
+          : `${prefix}No RBZ PDFs found for ${target.toLocaleString("en-GB", { month: "long", year: "numeric" })}`,
       targetDate: targetIso,
       fellBack,
       imported,
