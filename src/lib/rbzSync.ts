@@ -95,6 +95,8 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
 
     const { parseRbzPdf } = await import("./pdfParser");
 
+    const newPublications: NewPublication[] = [];
+
     for (const entry of data.entries) {
       if (existingDates.has(entry.date)) { skipped++; continue; }
       try {
@@ -117,6 +119,7 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
         }
         await addRates(rows);
         imported++;
+        newPublications.push({ date: entry.date, url: entry.url, count: rows.length });
         await addAudit({
           ts: new Date().toISOString(),
           action: "RBZ PDF Imported",
@@ -142,17 +145,23 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
       ? data.entries[data.entries.length - 1].date
       : undefined;
     const prefix = fellBack ? "Weekend fallback — " : "";
+    const next = computeNextCheck(haveTarget, fellBack);
     return {
       status: haveTarget ? "connected" : "cached",
       message: haveTarget
-        ? `${prefix}Live RBZ data – ${formatLongDate(target)} • ${imported} new, ${skipped} cached`
+        ? `${prefix}Live RBZ data – ${formatLongDate(target)} • ${imported} new, ${skipped} cached · ${next.reason}`
         : latestAvailable
-          ? `${prefix}Awaiting RBZ publication for ${formatLongDate(target)} – showing latest (${latestAvailable})`
-          : `${prefix}No RBZ PDFs found for ${target.toLocaleString("en-GB", { month: "long", year: "numeric" })}`,
+          ? `${prefix}Awaiting RBZ publication for ${formatLongDate(target)} – showing latest (${latestAvailable}) · ${next.reason}`
+          : `${prefix}No RBZ PDFs found for ${target.toLocaleString("en-GB", { month: "long", year: "numeric" })} · ${next.reason}`,
       targetDate: targetIso,
       fellBack,
       imported,
       skipped,
+      haveTarget,
+      latestAvailable,
+      newPublications,
+      nextCheckDelayMs: next.ms,
+      nextCheckReason: next.reason,
     };
   } catch (e) {
     await addAudit({
@@ -163,13 +172,19 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
       payload: { targetDate: targetIso, monthUrl },
     });
     const prefix = fellBack ? "Weekend fallback — " : "";
+    // On failure, back off more aggressively to avoid hammering a broken endpoint.
+    const next = { ms: 10 * 60 * 1000, reason: "Sync error — retrying in 10 min." };
     return {
       status: "cached",
-      message: `${prefix}Using cached data – ${formatLongDate(target)} (sync error)`,
+      message: `${prefix}Using cached data – ${formatLongDate(target)} (sync error) · ${next.reason}`,
       targetDate: targetIso,
       fellBack,
       imported,
       skipped,
+      haveTarget: false,
+      newPublications: [],
+      nextCheckDelayMs: next.ms,
+      nextCheckReason: next.reason,
     };
   }
 };
