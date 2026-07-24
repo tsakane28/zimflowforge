@@ -167,8 +167,8 @@ export const syncLatestRBZRates = async (): Promise<SyncResult> => {
       payload: { targetDate: targetIso, monthUrl },
     });
     const prefix = fellBack ? "Weekend fallback — " : "";
-    // On failure, back off more aggressively to avoid hammering a broken endpoint.
-    const next = { ms: 10 * 60 * 1000, reason: "Sync error — retrying in 10 min." };
+    const errMin = loadSettings().errorMinutes;
+    const next = { ms: errMin * 60 * 1000, reason: `Sync error — retrying in ${errMin} min.` };
     return {
       status: "cached",
       message: `${prefix}Using cached data – ${formatLongDate(target)} (sync error) · ${next.reason}`,
