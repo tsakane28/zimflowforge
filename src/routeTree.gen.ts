@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkbenchRouteImport } from './routes/workbench'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DataIntegrityRouteImport } from './routes/data-integrity'
 import { Route as AboutRouteImport } from './routes/about'
@@ -23,6 +24,11 @@ import { Route as ApiPublicRbzPdfRouteImport } from './routes/api/public/rbz.pdf
 const WorkbenchRoute = WorkbenchRouteImport.update({
   id: '/workbench',
   path: '/workbench',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/mcp': typeof McpRoute
+  '/settings': typeof SettingsRoute
   '/workbench': typeof WorkbenchRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/mcp': typeof McpRoute
+  '/settings': typeof SettingsRoute
   '/workbench': typeof WorkbenchRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/data-integrity': typeof DataIntegrityRoute
   '/mcp': typeof McpRoute
+  '/settings': typeof SettingsRoute
   '/workbench': typeof WorkbenchRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/data-integrity'
     | '/mcp'
+    | '/settings'
     | '/workbench'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/data-integrity'
     | '/mcp'
+    | '/settings'
     | '/workbench'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/data-integrity'
     | '/mcp'
+    | '/settings'
     | '/workbench'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DataIntegrityRoute: typeof DataIntegrityRoute
   McpRoute: typeof McpRoute
+  SettingsRoute: typeof SettingsRoute
   WorkbenchRoute: typeof WorkbenchRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -170,6 +183,13 @@ declare module '@tanstack/react-router' {
       path: '/workbench'
       fullPath: '/workbench'
       preLoaderRoute: typeof WorkbenchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DataIntegrityRoute: DataIntegrityRoute,
   McpRoute: McpRoute,
+  SettingsRoute: SettingsRoute,
   WorkbenchRoute: WorkbenchRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:

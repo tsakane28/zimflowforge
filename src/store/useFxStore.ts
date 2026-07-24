@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRecord } from "@/lib/db";
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
+import { loadSettings } from "@/lib/syncSettings";
 import { describeFallback, formatLongDate, mostRecentBusinessDay, toIsoDate } from "@/lib/businessDay";
 
 
@@ -59,9 +60,10 @@ export const useFxStore = create<FxState>((set, get) => ({
     void mostRecentBusinessDay;
     // Auto-fetch latest publication on load (weekend-aware).
     try { await get().runSync(); } catch { /* swallow — cached data already shown */ }
-    // Re-runs when the tab regains focus (dynamic retry handled by runSync).
+    // Re-runs when the tab regains focus, or when the user updates sync settings.
     if (typeof window !== "undefined") {
       window.addEventListener("focus", () => { void get().runSync().catch(() => {}); });
+      window.addEventListener("fx:sync-settings-changed", () => { void get().runSync().catch(() => {}); });
     }
   },
 
@@ -87,12 +89,13 @@ export const useFxStore = create<FxState>((set, get) => ({
     });
     await get().refreshAudit();
 
-    // Notify user for every new PDF picked up on a subsequent sync.
-    if (hadPriorSync && res.newPublications.length > 0) {
+    // Notify user for every new PDF picked up on a subsequent sync (respects settings).
+    const settings = loadSettings();
+    if (hadPriorSync && settings.notifyOnNewPublication && res.newPublications.length > 0) {
       for (const pub of res.newPublications) {
         toast.success(`New RBZ publication – ${pub.date}`, {
           description: `${pub.count} currency rows imported. Click to open the source PDF.`,
-          duration: 15000,
+          duration: Math.max(1, settings.notifyDurationSeconds) * 1000,
           action: {
             label: "Open PDF",
             onClick: () => window.open(pub.url, "_blank", "noopener,noreferrer"),

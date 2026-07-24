@@ -1,4 +1,4 @@
-import { Activity, Database, Info, LayoutDashboard, Menu, Wallet, X } from "lucide-react";
+import { Activity, Database, Info, LayoutDashboard, Menu, Settings, Wallet, X } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useFxStore } from "@/store/useFxStore";
@@ -8,6 +8,7 @@ const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, desc: "Live rates & trends" },
   { to: "/workbench", label: "Transaction Workbench", icon: Wallet, desc: "Settlement calculator" },
   { to: "/data-integrity", label: "Data Integrity Center", icon: Database, desc: "History & audit" },
+  { to: "/settings", label: "Sync Settings", icon: Settings, desc: "Windows & notifications" },
   { to: "/about", label: "Info", icon: Info, desc: "How this was built · README" },
 ] as const;
 
