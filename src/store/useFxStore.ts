@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "sonner";
 import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRecord } from "@/lib/db";
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
@@ -15,6 +16,8 @@ interface FxState {
   targetDate: string; // today's RBZ publication date (with weekend fallback)
   fellBack: boolean;
   lastSyncAt?: string;
+  nextCheckAt?: string;
+  nextCheckReason?: string;
   initialized: boolean;
   init: () => Promise<void>;
   refreshAudit: () => Promise<void>;
@@ -22,6 +25,8 @@ interface FxState {
   runSync: () => Promise<void>;
   importPdf: (file: File) => Promise<{ count: number; date: string }>;
 }
+
+let retryTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const useFxStore = create<FxState>((set, get) => ({
   rates: [],
@@ -54,12 +59,9 @@ export const useFxStore = create<FxState>((set, get) => ({
     void mostRecentBusinessDay;
     // Auto-fetch latest publication on load (weekend-aware).
     try { await get().runSync(); } catch { /* swallow — cached data already shown */ }
-    // Re-poll every 15 min so today's PDF is picked up once RBZ publishes it
-    // without needing a manual refresh. Also re-runs when the tab regains focus.
+    // Re-runs when the tab regains focus (dynamic retry handled by runSync).
     if (typeof window !== "undefined") {
-      const poll = () => { void get().runSync().catch(() => {}); };
-      window.setInterval(poll, 15 * 60 * 1000);
-      window.addEventListener("focus", poll);
+      window.addEventListener("focus", () => { void get().runSync().catch(() => {}); });
     }
   },
 
@@ -68,17 +70,41 @@ export const useFxStore = create<FxState>((set, get) => ({
   refreshRates: async () => set({ rates: await getAllRates() }),
 
   runSync: async () => {
+    if (retryTimer) { clearTimeout(retryTimer); retryTimer = undefined; }
+    const hadPriorSync = !!get().lastSyncAt;
     set({ syncStatus: "syncing", syncMessage: "Contacting RBZ publication endpoint…" });
     const res = await syncLatestRBZRates();
     await get().refreshRates();
+    const nextAt = new Date(Date.now() + res.nextCheckDelayMs).toISOString();
     set({
       syncStatus: res.status === "cached" ? "cached" : "connected",
       syncMessage: res.message,
       targetDate: res.targetDate,
       fellBack: res.fellBack,
       lastSyncAt: new Date().toISOString(),
+      nextCheckAt: nextAt,
+      nextCheckReason: res.nextCheckReason,
     });
     await get().refreshAudit();
+
+    // Notify user for every new PDF picked up on a subsequent sync.
+    if (hadPriorSync && res.newPublications.length > 0) {
+      for (const pub of res.newPublications) {
+        toast.success(`New RBZ publication – ${pub.date}`, {
+          description: `${pub.count} currency rows imported. Click to open the source PDF.`,
+          duration: 15000,
+          action: {
+            label: "Open PDF",
+            onClick: () => window.open(pub.url, "_blank", "noopener,noreferrer"),
+          },
+        });
+      }
+    }
+
+    // Schedule the next auto-check using the backoff computed by rbzSync.
+    if (typeof window !== "undefined") {
+      retryTimer = setTimeout(() => { void get().runSync().catch(() => {}); }, res.nextCheckDelayMs);
+    }
   },
 
   importPdf: async (file: File) => {
