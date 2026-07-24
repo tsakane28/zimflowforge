@@ -1,5 +1,6 @@
 import { addAudit, addRates, getAllRates } from "./db";
 import { describeFallback, formatLongDate, toIsoDate } from "./businessDay";
+import { loadSettings } from "./syncSettings";
 
 export interface NewPublication { date: string; url: string; count: number }
 
@@ -19,31 +20,25 @@ export interface SyncResult {
   nextCheckReason: string;
 }
 
-/**
- * Smart retry/backoff schedule:
- *  - Weekdays 08:00-14:59 local, target not yet found → poll every 5 min
- *   (RBZ typically publishes mid-morning; we want to catch it quickly).
- *  - Weekdays 15:00-17:59, still missing → 15 min (still expected today).
- *  - Weekdays 18:00+, still missing → 60 min (unlikely to appear today).
- *  - Target already imported → 60 min (just watching for corrections).
- *  - Weekend / public holiday fallback → 4 h (nothing new will publish).
- */
+/** Configurable retry/backoff schedule — driven by user settings (Settings page). */
 const computeNextCheck = (haveTarget: boolean, fellBack: boolean, now = new Date()) => {
   const MIN = 60 * 1000;
+  const s = loadSettings();
   const hour = now.getHours();
   if (fellBack) {
-    return { ms: 4 * 60 * MIN, reason: "Weekend — RBZ does not publish. Rechecking in 4 h." };
+    if (!s.weekendEnabled) {
+      return { ms: s.weekendIdleMinutes * MIN, reason: `Weekend — checks disabled. Rechecking in ${s.weekendIdleMinutes} min.` };
+    }
+    return { ms: s.weekendIdleMinutes * MIN, reason: `Weekend — rechecking in ${s.weekendIdleMinutes} min.` };
   }
   if (haveTarget) {
-    return { ms: 60 * MIN, reason: "Today's rate captured. Rechecking hourly for corrections." };
+    return { ms: s.haveTargetMinutes * MIN, reason: `Today's rate captured. Rechecking every ${s.haveTargetMinutes} min for corrections.` };
   }
-  if (hour >= 8 && hour < 15) {
-    return { ms: 5 * MIN, reason: "Awaiting today's publication — rechecking every 5 min." };
+  const win = s.weekdayWindows.find((w) => hour >= w.startHour && hour < w.endHour);
+  if (win) {
+    return { ms: win.intervalMinutes * MIN, reason: `Publication window (${String(win.startHour).padStart(2,"0")}:00–${String(win.endHour).padStart(2,"0")}:00) — rechecking every ${win.intervalMinutes} min.` };
   }
-  if (hour >= 15 && hour < 18) {
-    return { ms: 15 * MIN, reason: "Late-window watch — rechecking every 15 min." };
-  }
-  return { ms: 60 * MIN, reason: "Off-hours — rechecking hourly." };
+  return { ms: s.weekdayOffHoursMinutes * MIN, reason: `Off-hours — rechecking every ${s.weekdayOffHoursMinutes} min.` };
 };
 
 interface ScrapeEntry { date: string; url: string }
