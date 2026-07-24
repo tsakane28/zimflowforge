@@ -1,6 +1,8 @@
 import { addAudit, addRates, getAllRates } from "./db";
 import { describeFallback, formatLongDate, toIsoDate } from "./businessDay";
 
+export interface NewPublication { date: string; url: string; count: number }
+
 export interface SyncResult {
   status: "connected" | "cached" | "manual";
   message: string;
@@ -8,7 +10,41 @@ export interface SyncResult {
   fellBack: boolean;
   imported: number;
   skipped: number;
+  haveTarget: boolean;
+  latestAvailable?: string;
+  newPublications: NewPublication[];
+  /** Recommended delay in ms before the next auto sync check. */
+  nextCheckDelayMs: number;
+  /** Human readable explanation of the next-check schedule. */
+  nextCheckReason: string;
 }
+
+/**
+ * Smart retry/backoff schedule:
+ *  - Weekdays 08:00-14:59 local, target not yet found → poll every 5 min
+ *   (RBZ typically publishes mid-morning; we want to catch it quickly).
+ *  - Weekdays 15:00-17:59, still missing → 15 min (still expected today).
+ *  - Weekdays 18:00+, still missing → 60 min (unlikely to appear today).
+ *  - Target already imported → 60 min (just watching for corrections).
+ *  - Weekend / public holiday fallback → 4 h (nothing new will publish).
+ */
+const computeNextCheck = (haveTarget: boolean, fellBack: boolean, now = new Date()) => {
+  const MIN = 60 * 1000;
+  const hour = now.getHours();
+  if (fellBack) {
+    return { ms: 4 * 60 * MIN, reason: "Weekend — RBZ does not publish. Rechecking in 4 h." };
+  }
+  if (haveTarget) {
+    return { ms: 60 * MIN, reason: "Today's rate captured. Rechecking hourly for corrections." };
+  }
+  if (hour >= 8 && hour < 15) {
+    return { ms: 5 * MIN, reason: "Awaiting today's publication — rechecking every 5 min." };
+  }
+  if (hour >= 15 && hour < 18) {
+    return { ms: 15 * MIN, reason: "Late-window watch — rechecking every 15 min." };
+  }
+  return { ms: 60 * MIN, reason: "Off-hours — rechecking hourly." };
+};
 
 interface ScrapeEntry { date: string; url: string }
 interface ScrapeResponse { month: number; year: number; monthUrl?: string; entries: ScrapeEntry[]; error?: string }
