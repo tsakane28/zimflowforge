@@ -60,9 +60,10 @@ export const useFxStore = create<FxState>((set, get) => ({
     void mostRecentBusinessDay;
     // Auto-fetch latest publication on load (weekend-aware).
     try { await get().runSync(); } catch { /* swallow — cached data already shown */ }
-    // Re-runs when the tab regains focus (dynamic retry handled by runSync).
+    // Re-runs when the tab regains focus, or when the user updates sync settings.
     if (typeof window !== "undefined") {
       window.addEventListener("focus", () => { void get().runSync().catch(() => {}); });
+      window.addEventListener("fx:sync-settings-changed", () => { void get().runSync().catch(() => {}); });
     }
   },
 
