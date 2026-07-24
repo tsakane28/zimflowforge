@@ -89,12 +89,13 @@ export const useFxStore = create<FxState>((set, get) => ({
     });
     await get().refreshAudit();
 
-    // Notify user for every new PDF picked up on a subsequent sync.
-    if (hadPriorSync && res.newPublications.length > 0) {
+    // Notify user for every new PDF picked up on a subsequent sync (respects settings).
+    const settings = loadSettings();
+    if (hadPriorSync && settings.notifyOnNewPublication && res.newPublications.length > 0) {
       for (const pub of res.newPublications) {
         toast.success(`New RBZ publication – ${pub.date}`, {
           description: `${pub.count} currency rows imported. Click to open the source PDF.`,
-          duration: 15000,
+          duration: Math.max(1, settings.notifyDurationSeconds) * 1000,
           action: {
             label: "Open PDF",
             onClick: () => window.open(pub.url, "_blank", "noopener,noreferrer"),
