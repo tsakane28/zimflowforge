@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, RotateCcw, Save, Settings as SettingsIcon, Trash2 } from "lucide-react";
+import { Bell, Plus, RotateCcw, Save, Settings as SettingsIcon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   DEFAULT_SETTINGS,
@@ -10,6 +10,9 @@ import {
   resetSettings,
   saveSettings,
 } from "@/lib/syncSettings";
+import { requestBrowserNotificationPermission } from "@/lib/alerts";
+
+const KNOWN_CURRENCIES = ["USD", "ZAR", "GBP", "EUR", "BWP", "CNY", "JPY", "AUD", "CAD", "CHF"];
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -202,6 +205,101 @@ function SettingsPage() {
               disabled={!s.notifyOnNewPublication}
             />
           </Field>
+        </div>
+      </section>
+
+      {/* Alerts */}
+      <section className="bg-card border border-border rounded-lg">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+          <Bell className="h-4 w-4 text-primary" />
+          <div>
+            <h2 className="text-sm font-semibold">Threshold alerts & digest</h2>
+            <p className="text-[11px] text-muted-foreground">
+              Watch specific currencies for material moves and get a once-a-day summary.
+            </p>
+          </div>
+        </div>
+        <div className="p-4 space-y-4">
+          <Field label="Watched currencies (max 5)">
+            <div className="flex flex-wrap gap-1.5">
+              {KNOWN_CURRENCIES.map((c) => {
+                const on = s.watchedCurrencies.includes(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => {
+                      const next = on
+                        ? s.watchedCurrencies.filter((x) => x !== c)
+                        : s.watchedCurrencies.length >= 5
+                          ? s.watchedCurrencies
+                          : [...s.watchedCurrencies, c];
+                      update("watchedCurrencies", next);
+                    }}
+                    className={`px-2 py-1 rounded text-[11px] font-mono border transition-colors ${
+                      on
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-muted-foreground border-border hover:text-foreground"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Threshold (%)">
+              <NumberInput
+                value={s.thresholdPct}
+                min={0}
+                onChange={(v) => update("thresholdPct", v)}
+              />
+            </Field>
+            <label className="flex items-end gap-2 text-xs pb-2">
+              <input
+                type="checkbox"
+                checked={s.dailyDigest}
+                onChange={(e) => update("dailyDigest", e.target.checked)}
+                className="h-4 w-4"
+              />
+              <span>Daily digest (once per business day)</span>
+            </label>
+            <label className="flex items-end gap-2 text-xs pb-2">
+              <input
+                type="checkbox"
+                checked={s.quietHours}
+                onChange={(e) => update("quietHours", e.target.checked)}
+                className="h-4 w-4"
+              />
+              <span>Quiet hours — suppress non-critical toasts outside windows</span>
+            </label>
+            <label className="flex items-end gap-2 text-xs pb-2">
+              <input
+                type="checkbox"
+                checked={s.browserNotifications}
+                onChange={async (e) => {
+                  const on = e.target.checked;
+                  if (on) {
+                    const p = await requestBrowserNotificationPermission();
+                    if (p !== "granted") {
+                      toast.error("Browser notifications denied by the OS/browser.");
+                      return;
+                    }
+                  }
+                  update("browserNotifications", on);
+                }}
+                className="h-4 w-4"
+              />
+              <span>Also fire OS notifications when tab is backgrounded</span>
+            </label>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Threshold compares the newest imported publication against the previous cached day for
+            each watched currency. New-publication alerts always fire — quiet hours only mute
+            threshold and digest toasts.
+          </p>
         </div>
       </section>
 
