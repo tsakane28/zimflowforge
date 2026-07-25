@@ -94,6 +94,18 @@ function Dashboard() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {today.length === 0 &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-card border border-border rounded-lg p-5 h-[188px] animate-pulse space-y-4"
+                aria-hidden
+              >
+                <div className="h-3 w-24 bg-muted rounded" />
+                <div className="h-10 w-40 bg-muted rounded" />
+                <div className="h-3 w-32 bg-muted/70 rounded" />
+              </div>
+            ))}
           {today
             .slice()
             .sort((a, b) => {
