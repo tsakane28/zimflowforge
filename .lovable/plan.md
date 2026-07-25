@@ -1,52 +1,64 @@
-# Add Project Documentation + Info Page
+# Improvement Pass — Mobile Polish, Alerts, Security
 
-## Goal
-Document the entire system (technology stack, architecture, RBZ scraping flow, data model, etc.) and surface it inside the app via a new **Info** button in the top nav, opening an `/about` route that also offers a downloadable PDF README.
+Scope: 3/5 (meaningful upgrade, no architectural rewrite). Three tracks in one pass.
 
-## Deliverables
+---
 
-### 1. Written documentation (Markdown source of truth)
-Create `docs/PROJECT_README.md` covering:
-- **Overview** — what the Zimbabwe FX Operations Workbench does
-- **Technology stack**
-  - Frontend: React 19, TanStack Start v1, TanStack Router (file-based), TanStack Query, Zustand, Tailwind v4, shadcn/ui, Framer Motion, Recharts
-  - Backend runtime: Cloudflare Workers (TanStack Start server routes + server functions)
-  - Storage: IndexedDB (Dexie-style wrapper in `src/lib/db.ts`) for rates + audit log
-  - PDF parsing: `pdfjs-dist` in the browser
-  - Build: Vite 7, Bun
-- **System architecture**
-  - Client store (`useFxStore`) — initialization, seed data, auto-sync
-  - Weekend-aware business-day logic (`businessDay.ts`)
-  - RBZ scraper proxy routes (`/api/public/rbz/scrape`, `/api/public/rbz/pdf`) — why a server proxy is needed (CORS), ranged-GET probe trick
-  - Sync pipeline (`rbzSync.ts`) — scrape index → dedupe vs IndexedDB → fetch PDFs → parse → persist + audit
-  - Manual PDF upload fallback
-  - Dashboard rendering + USD/ZAR priority sort
-- **Data model** — RateRecord, AuditEntry shapes
-- **Operational notes** — timezone handling (`toIsoDate` local-date fix), fallback when RBZ has no PDF for target date
-- **Project structure** — key folders
-- **How to extend** — adding a new currency, changing fallback rules
+## 1. Visual polish & mobile UX
 
-### 2. PDF generation
-Generate `public/project-readme.pdf` from the Markdown so it can be served as a static download via `<a href="/project-readme.pdf" download>`. Build script (`scripts/build-readme-pdf.mjs`) using a lightweight markdown→PDF approach (e.g. `md-to-pdf` or jsPDF with sectioned content). Run once and commit the PDF; no runtime generation needed.
+Current pain points on 360px width:
+- Header rows in `AppShell`, dashboard, and `SyncControls` use bare `flex flex-wrap` — long status text pushes buttons off-screen.
+- `RateCard` grid uses fixed min-widths that cause horizontal scroll on small phones.
+- Trend chart legend and workbench split-screen do not collapse below `sm`.
+- `SettlementReport` and audit-log JSON viewer overflow horizontally.
 
-### 3. New `/about` route
-- `src/routes/about.tsx` — full About / How-it-was-built page rendering the same content as the Markdown (sectioned with cards, table of contents)
-- Distinct `head()` metadata (title, description, og:title/description)
-- Prominent **Download README (PDF)** button linking to `/project-readme.pdf`
-- "View on GitHub"-style external link omitted unless user provides URL
+Fixes:
+- Rework header rows using the `grid-cols-[minmax(0,1fr)_auto]` + `min-w-0` / `shrink-0` / `truncate` pattern for `AppShell` top bar, dashboard hero, and `SyncControls`.
+- Convert the currency grid to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` with tabular-nums numeric alignment.
+- Stack the workbench calculator vertically below `md`; make the settlement summary a sticky bottom sheet on mobile.
+- Make the audit-log JSON viewer wrap with `break-all` inside a scroll container.
+- Tighten sidebar drawer: full-height, safe-area padding, focus trap while open, close on route change.
+- Add empty/loading skeletons for the rate grid and trend chart so the first paint doesn't jump.
 
-### 4. Info button in the menu
-- Edit `src/components/AppShell.tsx` nav to add an **Info** entry (lucide `Info` icon) routing to `/about`
-- Works in desktop nav and mobile menu
+## 2. Alerts & automation
 
-## Files to add
-- `docs/PROJECT_README.md`
-- `public/project-readme.pdf` (generated artifact)
-- `scripts/build-readme-pdf.mjs`
-- `src/routes/about.tsx`
+Extend the existing toast/notification pipeline:
+- **Threshold alerts**: in Settings, let the user pick 1–3 watched currencies (default USD, ZAR) and a % move threshold. On each sync, compare the newest rate to the previous day's; fire a toast + persistent audit entry when the move exceeds the threshold.
+- **Daily digest**: at the first successful sync of a business day, show a one-shot "Daily digest" toast summarising target date, # of new rows, and top mover, with an "Open dashboard" action.
+- **Browser notifications**: opt-in toggle in Settings that requests `Notification.permission` and mirrors new-publication + threshold toasts as OS notifications (so background tabs still alert). Falls back silently when denied.
+- **Quiet hours**: reuse the existing publication-window settings — suppress non-critical toasts outside configured hours; new-publication alerts always fire.
+- **Audit surfacing**: every alert writes a structured `AuditEntry` (`action: "Alert Fired"`) so users have a record.
 
-## Files to edit
-- `src/components/AppShell.tsx` (add Info nav item)
+## 3. Security hardening
 
-## Open question
-Do you want the PDF auto-regenerated on each build (add to `package.json` build script), or is a one-time committed PDF fine? Default: one-time committed PDF, regenerated manually with `bun run scripts/build-readme-pdf.mjs` when docs change.
+The app is client-only (IndexedDB, no auth, no Cloud). Security work focuses on the two server routes and the MCP surface, plus client-side hygiene:
+
+- **`/api/public/rbz/pdf` proxy**:
+  - Tighten host allowlist to exact `www.rbz.co.zw` (drop the loose `.rbz.co.zw` suffix regex to avoid subdomain smuggling).
+  - Enforce `pathname` starts with `/documents/Exchange_Rates/` and ends with `.pdf`.
+  - Cap upstream response size (e.g. 10 MB) and enforce a 15 s fetch timeout via `AbortController`.
+  - Validate upstream `Content-Type` is `application/pdf` before returning.
+  - Add `X-Content-Type-Options: nosniff`, `Content-Disposition: inline`, and drop `Access-Control-Allow-Origin: *` in favour of an app-origin allowlist (still permissive for the MCP use case if needed).
+- **`/api/public/rbz/scrape`**:
+  - Validate `year`/`month` with Zod (year 2020–2100, month 1–12) instead of ad-hoc `parseInt`.
+  - Add a per-IP in-memory rate limit (e.g. 30 req/min) to prevent using our worker as a probe amplifier.
+  - Add the same 15 s abort + narrower CORS headers.
+- **MCP tools** (`list-publications`, `get-latest-publication`): apply the same size/timeout limits on `fetch`, and reject any `on_or_before` outside a sane window.
+- **Client-side**:
+  - Add Zod validation at the boundary of `parseRbzPdf` output before writing to IndexedDB (defensive against malformed PDFs).
+  - Sanitise the audit-log JSON viewer — currently renders via `JSON.stringify` which is safe, but confirm no `dangerouslySetInnerHTML` slipped in and add `rel="noopener noreferrer"` to every external link (PDF toast action already does this — audit the About page and settings page).
+  - Add a strict `<meta http-equiv="Content-Security-Policy">` in `__root.tsx` head allowing only self, `www.rbz.co.zw` for images/objects, and inline styles (needed by Tailwind runtime). Document the trade-offs.
+- **Docs**: update the About page + README PDF with a short "Security & data handling" section explaining that all data stays in the browser (IndexedDB), no telemetry, no auth, and what the proxy does.
+
+## Technical notes
+
+- No backend/database changes; no new dependencies required (Zod is already installed).
+- Settings schema in `src/lib/syncSettings.ts` gains `watchedCurrencies`, `thresholdPct`, `browserNotifications`, `dailyDigest` fields with backwards-compatible defaults.
+- Rate limiter for scrape route uses a module-scoped `Map<string, number[]>` — acceptable for a single-worker deployment; documented as best-effort.
+- CSP will be added in report-only mode first (via meta) to avoid breaking the preview; can promote to enforced after one QA pass.
+
+## Out of scope
+
+- Real authentication / multi-user (app has no accounts).
+- Server-side persistence of alerts (would require Lovable Cloud — not requested).
+- Data-depth analytics like cross-rate calculator or drill-down pages (deferred).
