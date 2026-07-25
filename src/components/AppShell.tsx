@@ -102,30 +102,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <main className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-4 sm:px-6 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              onClick={() => setOpen(true)}
-              className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground"
-              aria-label="Open menu"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground truncate">
-                RBZ — Operations Console
-              </div>
-              <div className="text-sm font-semibold text-foreground truncate">
-                {nav.find((n) => n.to === path)?.label ?? "Workbench"}
-              </div>
+        <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-3 sm:px-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+          <button
+            onClick={() => setOpen(true)}
+            className="lg:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground truncate">
+              RBZ — Operations Console
+            </div>
+            <div className="text-sm font-semibold text-foreground truncate">
+              {nav.find((n) => n.to === path)?.label ?? "Workbench"}
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4 text-xs font-mono text-muted-foreground">
+          <div className="hidden md:flex items-center gap-4 text-xs font-mono text-muted-foreground shrink-0">
             <div>SESSION&nbsp;<span className="text-foreground">TRZ-{new Date().getFullYear()}-0431</span></div>
             <div>OPS&nbsp;<span className="text-foreground">treasury@bank.zw</span></div>
           </div>
-          <div className="md:hidden flex items-center gap-2 text-[11px] font-mono">
-            <span className={cn("h-2 w-2 rounded-full", statusColor[status])} />
+          <div className="md:hidden flex items-center gap-2 text-[11px] font-mono shrink-0">
+            <span className={cn("h-2 w-2 rounded-full", statusColor[status])} aria-label={`Sync ${status}`} />
           </div>
         </header>
         <div className="flex-1 overflow-auto">{children}</div>

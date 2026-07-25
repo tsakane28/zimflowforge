@@ -102,8 +102,25 @@ export const useFxStore = create<FxState>((set, get) => ({
             onClick: () => window.open(pub.url, "_blank", "noopener,noreferrer"),
           },
         });
+        if (settings.browserNotifications) {
+          fireBrowserNotification(
+            `New RBZ publication – ${pub.date}`,
+            `${pub.count} currency rows imported.`,
+            pub.url,
+          );
+        }
       }
     }
+
+    // Threshold + daily digest alerts (idempotent per business day).
+    try {
+      await fireAlerts({
+        rates: get().rates,
+        targetIso: res.targetDate,
+        newPubCount: res.newPublications.length,
+        haveTarget: res.status === "connected",
+      });
+    } catch { /* alerts must never break the sync loop */ }
 
     // Schedule the next auto-check using the backoff computed by rbzSync.
     if (typeof window !== "undefined") {

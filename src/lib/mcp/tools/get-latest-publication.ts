@@ -18,6 +18,8 @@ const isWeekendUTC = (y: number, m: number, d: number) => {
 };
 
 async function pdfExists(url: string): Promise<boolean> {
+  const ac = new AbortController();
+  const to = setTimeout(() => ac.abort(), 8_000);
   try {
     const r = await fetch(url, {
       method: "GET",
@@ -25,12 +27,14 @@ async function pdfExists(url: string): Promise<boolean> {
         "User-Agent": "Mozilla/5.0 ZW-FX-Workbench/1.0",
         Range: "bytes=0-0",
       },
+      signal: ac.signal,
     });
     if (r.status === 200 || r.status === 206) {
       try { await r.arrayBuffer(); } catch { /* ignore */ }
       return true;
     }
-  } catch { /* ignore */ }
+  } catch { /* ignore network error or timeout */ }
+  finally { clearTimeout(to); }
   return false;
 }
 

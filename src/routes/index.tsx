@@ -62,20 +62,20 @@ function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px]">
+    <div className="p-4 sm:p-6 space-y-6 max-w-[1600px]">
       <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">Rate Intelligence</h1>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:items-baseline sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold tracking-tight truncate">Rate Intelligence</h1>
             <p className="text-xs text-muted-foreground">
               RBZ daily exchange-rate publication ingestion &amp; treasury dashboards.
             </p>
           </div>
-          <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-            Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span>
-            {fellBack && <span className="ml-2 text-warning">(weekend fallback)</span>}
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.18em] text-muted-foreground text-right shrink-0">
+            <div>Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span></div>
+            {fellBack && <div className="text-warning">weekend fallback</div>}
             {!isExact && displayDate && (
-              <span className="ml-2 text-destructive">no PDF yet • showing {displayDate}</span>
+              <div className="text-destructive">no PDF yet · showing {displayDate}</div>
             )}
           </div>
         </div>
