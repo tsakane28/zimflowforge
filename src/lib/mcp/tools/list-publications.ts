@@ -45,6 +45,8 @@ export default defineTool({
         .map(async (day) => {
           const pdfUrl = buildPdfUrl(year, month, day);
           const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const ac = new AbortController();
+          const to = setTimeout(() => ac.abort(), 8_000);
           try {
             const r = await fetch(pdfUrl, {
               method: "GET",
@@ -52,12 +54,14 @@ export default defineTool({
                 "User-Agent": "Mozilla/5.0 ZW-FX-Workbench/1.0",
                 Range: "bytes=0-0",
               },
+              signal: ac.signal,
             });
             if (r.status === 200 || r.status === 206) {
               try { await r.arrayBuffer(); } catch { /* ignore */ }
               return { date: iso, url: pdfUrl };
             }
-          } catch { /* ignore */ }
+          } catch { /* network error or timeout — treat as missing */ }
+          finally { clearTimeout(to); }
           return null;
         }),
     );

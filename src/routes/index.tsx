@@ -62,20 +62,20 @@ function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px]">
+    <div className="p-4 sm:p-6 space-y-6 max-w-[1600px]">
       <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">Rate Intelligence</h1>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:items-baseline sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold tracking-tight truncate">Rate Intelligence</h1>
             <p className="text-xs text-muted-foreground">
               RBZ daily exchange-rate publication ingestion &amp; treasury dashboards.
             </p>
           </div>
-          <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-            Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span>
-            {fellBack && <span className="ml-2 text-warning">(weekend fallback)</span>}
+          <div className="text-[11px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.18em] text-muted-foreground text-right shrink-0">
+            <div>Target&nbsp;<span className="text-foreground">{targetDate || "—"}</span></div>
+            {fellBack && <div className="text-warning">weekend fallback</div>}
             {!isExact && displayDate && (
-              <span className="ml-2 text-destructive">no PDF yet • showing {displayDate}</span>
+              <div className="text-destructive">no PDF yet · showing {displayDate}</div>
             )}
           </div>
         </div>
@@ -94,6 +94,18 @@ function Dashboard() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {today.length === 0 &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-card border border-border rounded-lg p-5 h-[188px] animate-pulse space-y-4"
+                aria-hidden
+              >
+                <div className="h-3 w-24 bg-muted rounded" />
+                <div className="h-10 w-40 bg-muted rounded" />
+                <div className="h-3 w-32 bg-muted/70 rounded" />
+              </div>
+            ))}
           {today
             .slice()
             .sort((a, b) => {
