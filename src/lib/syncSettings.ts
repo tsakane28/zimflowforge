@@ -1,4 +1,4 @@
-// User-configurable publication-check windows and notification timing.
+// User-configurable publication-check windows, notification timing, and alerts.
 // Persisted to localStorage; safe to read on the server (returns defaults).
 
 export interface Window {
@@ -26,6 +26,16 @@ export interface SyncSettings {
   notifyOnNewPublication: boolean;
   /** Toast duration in seconds. */
   notifyDurationSeconds: number;
+  /** Currencies to monitor for threshold alerts (max 5). */
+  watchedCurrencies: string[];
+  /** Percentage move that triggers a threshold alert. */
+  thresholdPct: number;
+  /** Mirror alerts as OS notifications when tab is backgrounded. */
+  browserNotifications: boolean;
+  /** Fire a one-shot summary toast on the first successful sync each business day. */
+  dailyDigest: boolean;
+  /** Suppress non-critical toasts outside configured weekday windows. */
+  quietHours: boolean;
 }
 
 export const DEFAULT_SETTINGS: SyncSettings = {
@@ -42,6 +52,11 @@ export const DEFAULT_SETTINGS: SyncSettings = {
   errorMinutes: 10,
   notifyOnNewPublication: true,
   notifyDurationSeconds: 15,
+  watchedCurrencies: ["USD", "ZAR"],
+  thresholdPct: 1.5,
+  browserNotifications: false,
+  dailyDigest: true,
+  quietHours: false,
 };
 
 const KEY = "fx.syncSettings.v1";
@@ -68,6 +83,14 @@ export const resetSettings = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(KEY);
   window.dispatchEvent(new CustomEvent("fx:sync-settings-changed"));
+};
+
+/** True when `now` falls inside any configured weekday window (or weekend if enabled). */
+export const isInsideActiveWindow = (s: SyncSettings, now = new Date()): boolean => {
+  const day = now.getDay();
+  if (day === 0 || day === 6) return s.weekendEnabled;
+  const h = now.getHours();
+  return s.weekdayWindows.some((w) => h >= w.startHour && h < w.endHour);
 };
 
 const fmtHour = (h: number) => `${String(h).padStart(2, "0")}:00`;
