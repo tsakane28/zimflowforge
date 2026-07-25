@@ -4,6 +4,7 @@ import { addAudit, addRates, getAllRates, getAudit, type AuditEntry, type RateRe
 import { ensureSeed } from "@/lib/seed";
 import { syncLatestRBZRates } from "@/lib/rbzSync";
 import { loadSettings } from "@/lib/syncSettings";
+import { fireAlerts, fireBrowserNotification } from "@/lib/alerts";
 import { describeFallback, formatLongDate, mostRecentBusinessDay, toIsoDate } from "@/lib/businessDay";
 
 
