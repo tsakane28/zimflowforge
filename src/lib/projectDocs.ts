@@ -113,8 +113,23 @@ export const DOC_SECTIONS: DocSection[] = [
     ],
   },
   {
+    id: "security",
+    title: "8. Security & Data Handling",
+    body: [
+      "The workbench is deliberately minimal in surface area. There are no user accounts, no telemetry, and no server-side database — every rate record and audit entry lives in the visitor's own browser (IndexedDB). Two thin server routes exist only to sidestep the RBZ website's lack of CORS headers.",
+    ],
+    bullets: [
+      "Data locality: all rates and audit events are stored in IndexedDB under the origin serving the app; clearing site data wipes everything. Nothing is transmitted anywhere except to www.rbz.co.zw via the proxy.",
+      "PDF proxy hardening: /api/public/rbz/pdf validates protocol, host, and path (www.rbz.co.zw + /documents/Exchange_Rates/*.pdf), enforces a 15 s timeout, caps the response at 10 MB, and rejects non-application/pdf upstream content-types.",
+      "Scrape hardening: /api/public/rbz/scrape validates year/month with Zod, applies a per-IP rate limit (30 requests/minute), and gives each probe an 8 s abort timeout.",
+      "MCP tools: list_rbz_publications and get_latest_rbz_publication reuse the same probe timeouts. The MCP server is public and read-only — it only reveals URLs that RBZ has already published on its own website.",
+      "External links: every out-of-app link (PDF viewer, README) uses rel=\"noopener noreferrer\" and target=\"_blank\".",
+      "No secrets: the app requires no API keys, tokens, or auth. There is nothing sensitive to leak.",
+    ],
+  },
+  {
     id: "extending",
-    title: "8. Extending the System",
+    title: "9. Extending the System",
     body: [
       "Common modifications and where to make them:",
     ],
